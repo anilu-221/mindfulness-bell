@@ -7470,7 +7470,7 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ BellManager)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -7478,45 +7478,30 @@ function _defineProperties(e, r) { for (var t = 0; t < r.length; t++) { var o = 
 function _createClass(e, r, t) { return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", { writable: !1 }), e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-var BellManager = /*#__PURE__*/function () {
-  function BellManager() {
-    var audioBasePath = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '../dist/audio/';
-    _classCallCheck(this, BellManager);
-    this.audioBasePath = audioBasePath;
-    this.currentSound = 'bell-01.wav';
-    this.volume = 0.5;
+var bellManager = /*#__PURE__*/function () {
+  function bellManager() {
+    _classCallCheck(this, bellManager);
+    this.currentBell = new Audio('src/audio/bell-01.wav');
+    this.bellBtn = document.getElementById('invite-bell-btn');
+    this.events();
   }
-  return _createClass(BellManager, [{
-    key: "setSound",
-    value: function setSound(soundId) {
-      var soundMap = {
-        'bell-sound-1': 'bell-01.wav',
-        'bell-sound-2': 'bell-02.wav',
-        'bell-sound-3': 'bell-03.wav'
-      };
-      this.currentSound = soundMap[soundId] || 'bell-01.wav';
-    }
-  }, {
-    key: "setVolume",
-    value: function setVolume(volumePercent) {
-      this.volume = Math.min(Math.max(volumePercent / 100, 0), 1);
-    }
-  }, {
-    key: "play",
-    value: function play() {
+  return _createClass(bellManager, [{
+    key: "events",
+    value: function events() {
       var _this = this;
-      var times = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      for (var i = 0; i < times; i++) {
-        setTimeout(function () {
-          var audio = new Audio("".concat(_this.audioBasePath).concat(_this.currentSound));
-          audio.volume = _this.volume;
-          audio.play();
-        }, i * 1500);
-      }
+      document.addEventListener('DOMContentLoaded', function () {
+        _this.bellBtn.addEventListener('click', _this.playBell.bind(_this));
+      });
+    }
+  }, {
+    key: "playBell",
+    value: function playBell() {
+      this.currentBell.volume = 0.5;
+      this.currentBell.play();
     }
   }]);
 }();
-
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (bellManager);
 
 /***/ })
 
