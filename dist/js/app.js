@@ -7481,8 +7481,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 var bellManager = /*#__PURE__*/function () {
   function bellManager() {
     _classCallCheck(this, bellManager);
-    this.currentBell = new Audio('src/audio/bell-01.wav');
     this.bellBtn = document.getElementById('invite-bell-btn');
+    this.bellVolume = document.getElementById('bell-volume');
+    this.bellNumber = document.getElementById('bell-number');
+    this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
+    this.currentBell = new Audio('src/audio/bell-01.wav');
     this.events();
   }
   return _createClass(bellManager, [{
@@ -7490,14 +7493,41 @@ var bellManager = /*#__PURE__*/function () {
     value: function events() {
       var _this = this;
       document.addEventListener('DOMContentLoaded', function () {
-        _this.bellBtn.addEventListener('click', _this.playBell.bind(_this));
+        _this.bellBtn.addEventListener('click', function () {
+          _this.updateSelectedBell();
+          _this.playBell();
+        });
       });
+    }
+  }, {
+    key: "updateSelectedBell",
+    value: function updateSelectedBell() {
+      var selectedId = 'bell-sound-1';
+      this.soundRadios.forEach(function (radio) {
+        if (radio.checked) {
+          selectedId = radio.id;
+        }
+      });
+      var soundMap = {
+        'bell-sound-1': 'src/audio/bell-01.wav',
+        'bell-sound-2': 'src/audio/bell-02.wav',
+        'bell-sound-3': 'src/audio/bell-03.wav'
+      };
+      this.currentBell = new Audio(soundMap[selectedId] || soundMap['bell-sound-1']);
     }
   }, {
     key: "playBell",
     value: function playBell() {
-      this.currentBell.volume = 0.5;
-      this.currentBell.play();
+      var _this2 = this;
+      var volume = parseInt(this.bellVolume.value, 10) || 50;
+      var times = parseInt(this.bellNumber.value, 10) || 1;
+      this.currentBell.volume = Math.min(Math.max(volume / 100, 0), 1);
+      for (var i = 0; i < times; i++) {
+        setTimeout(function () {
+          _this2.currentBell.currentTime = 0;
+          _this2.currentBell.play();
+        }, i * 1500);
+      }
     }
   }]);
 }();
