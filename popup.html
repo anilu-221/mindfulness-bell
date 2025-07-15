@@ -1,11 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<link rel="stylesheet" href="../dist/css/app.css">
+	<script src="../dist/js/app.js" defer></script>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Mindfulness Bell</title>
 </head>
 <body>
+	<div class="mb-popup__container container bg-light">
+		<!--Header-->
+		<div class="row align-items-center p-2 border-bottom">
+			<!--Title-->
+			<div class="col-8">
+				<h1 class="fs-4 pt-2">Mindfulness Bell</h1>
+			</div>
+			<!--Toggle-->
+			<div class="col-4">
+				<div class="form-check form-switch">
+					<input class="form-check-input" type="checkbox" role="switch" id="bellSwitch" checked>
+					<label class="form-check-label" for="bellSwitch">Turn On</label>
+				</div>
+			</div>
+		</div>
+		<!--Content-->
+			<!--Bell Sound-->
+			<div class="row my-4">
+				<div class="col-12">
+					<p class="mb-2">Bell Sound</p>
+					<div class="btn-group btn-group-sm" role="group" aria-label="Basic radio toggle button group for selecting bell sound">
+						<input type="radio" class="btn-check" name="bell-sound" id="bell-sound-1" autocomplete="off" checked>
+						<label class="btn btn-outline-primary" for="bell-sound-1">Bell 1</label>
 
+						<input type="radio" class="btn-check" name="bell-sound" id="bell-sound-2" autocomplete="off">
+						<label class="btn btn-outline-primary" for="bell-sound-2">Bell 2</label>
+
+						<input type="radio" class="btn-check" name="bell-sound" id="bell-sound-3" autocomplete="off">
+						<label class="btn btn-outline-primary" for="bell-sound-3">Bell 3</label>
+					</div>
+				</div>
+			</div>
+
+			<!--Interval and number-->
+			<div class="row my-4">
+				<div class="col-6">
+					<p class="mb-2">Ring bell every</p>
+					<div class="input-group input-group-sm">
+						<input type="number" class="form-control" id="bell-interval" placeholder="Enter interval in minutes" value="15">
+						<span class="input-group-text">minutes</span>
+					</div>
+				</div>
+				<div class="col-6">
+					<p class="mb-2">Number of bells</p>
+					<select class="form-select form-select-sm" aria-label="Default select example" id="bell-number">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+					</select>
+				</div>
+			</div>
+
+			<!--Start at-->
+			<div class="row my-4">
+				<div class="col-6">
+					<p class="mb-2">Start at</p>
+					<div class="input-group input-group-sm">
+						<input type="time" class="form-control" id="bell-start" value="09:00">
+					</div>
+				</div>
+				<div class="col-6">
+					<p class="mb-2">End at</p>
+					<div class="input-group input-group-sm">
+						<input type="time" class="form-control" id="bell-end" value="21:00">
+					</div>
+				</div>
+			</div>
+
+			<!--Volumne-->
+			<div class="row my-4">
+				<div class="col-6">
+					<p class="mb-2">Volume</p>
+					<div class="input-group input-group-sm">
+						<input type="range" class="form-range" id="bell-volume" min="0" max="100" value="50">
+					</div>
+				</div>
+			</div>
+
+			<!--CTA-->
+			<div class="row my-4">
+				<div class="col-12">
+					<button type="button" class="btn btn-sm btn-primary w-100" id="invite-bell-btn">Invite Bell Now</button>
+				</div>
+			</div>
+	</div>
 </body>
 </html>

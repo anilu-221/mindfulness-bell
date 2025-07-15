@@ -1,0 +1,35 @@
+//Typography
+$font-size-base: 1rem;
+$h1-font-size: $font-size-base * 3.5;
+$h2-font-size: $font-size-base * 2.5;
+$h3-font-size: $font-size-base * 2;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+//Borders
+$border-radius: .75rem;
+
+$white: #FFFFFF;
+$black: #111111;
+$primary: #ffbf11;
+$secondary: #ffac11;
+$dark: #28343d;
+$seafoam: #BBEDD7;
+$aqua: #04D8E5;
+$blue: #66ADFF;
+$violet: #7976FF;
+$purple: #AA67FF;
+$red: #FF495F;
+$orange: #FF8A55;
+$yellow: #FFCB11;
+$green: #30C150;
+$light:#f5f8f8 ;
+
+// Override Bootstrap Colors.
+// https://css-tricks.com/quick-and-dirty-bootstrap-overrides-at-runtime/
+:root {
+--bs-blue: #66ADFF;
+--bs-dark: #123543;
+--bs-light-rgb: 243, 243, 243;
+}
