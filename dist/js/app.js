@@ -7481,6 +7481,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 var bellManager = /*#__PURE__*/function () {
   function bellManager() {
     _classCallCheck(this, bellManager);
+    this.bellTimeouts = [];
     this.bellBtn = document.getElementById('invite-bell-btn');
     this.bellVolume = document.getElementById('bell-volume');
     this.volDisplay = document.getElementById('bell-volume-display');
@@ -7525,18 +7526,29 @@ var bellManager = /*#__PURE__*/function () {
       this.currentBell.volume = Math.min(Math.max(volumeValue / 100, 0), 1);
     }
   }, {
+    key: "resetBell",
+    value: function resetBell() {
+      // Clear all scheduled timeouts
+      this.bellTimeouts.forEach(function (timeoutId) {
+        return clearTimeout(timeoutId);
+      });
+      this.bellTimeouts = [];
+    }
+  }, {
     key: "playBell",
     value: function playBell() {
       var _this2 = this;
-      this.updateVolume();
-      var volume = parseInt(this.bellVolume.value, 10) || 50;
+      this.resetBell();
+      this.updateVolume(); // Set volume before playing
+
       var times = parseInt(this.bellNumber.value, 10) || 1;
-      this.currentBell.volume = Math.min(Math.max(volume / 100, 0), 1);
       for (var i = 0; i < times; i++) {
-        setTimeout(function () {
-          _this2.currentBell.currentTime = 0;
-          _this2.currentBell.play();
-        }, i * 1500);
+        var timeoutId = setTimeout(function () {
+          var bell = new Audio(_this2.currentBell.src);
+          bell.volume = _this2.currentBell.volume;
+          bell.play();
+        }, i * 8000);
+        this.bellTimeouts.push(timeoutId);
       }
     }
   }]);

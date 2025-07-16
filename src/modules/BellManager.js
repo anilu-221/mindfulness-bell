@@ -1,11 +1,12 @@
 class bellManager {
 	constructor() {
-		this.bellBtn     = document.getElementById('invite-bell-btn');
-		this.bellVolume  = document.getElementById('bell-volume');
-		this.volDisplay  = document.getElementById('bell-volume-display');
-		this.bellNumber  = document.getElementById('bell-number');
-		this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
-		this.currentBell = new Audio('src/audio/bell-01.wav');
+		this.bellTimeouts = [];
+		this.bellBtn      = document.getElementById('invite-bell-btn');
+		this.bellVolume   = document.getElementById('bell-volume');
+		this.volDisplay   = document.getElementById('bell-volume-display');
+		this.bellNumber   = document.getElementById('bell-number');
+		this.soundRadios  = document.querySelectorAll('input[name="bell-sound"]');
+		this.currentBell  = new Audio('src/audio/bell-01.wav');
 		this.events();
 	}
 
@@ -42,18 +43,25 @@ class bellManager {
 		this.currentBell.volume = Math.min(Math.max(volumeValue / 100, 0), 1);
 	}
 
+	resetBell() {
+		// Clear all scheduled timeouts
+		this.bellTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+		this.bellTimeouts = [];
+	}
+
 	playBell() {
-		this.updateVolume();
-		const volume = parseInt(this.bellVolume.value, 10) || 50;
+		this.resetBell();
+		this.updateVolume(); // Set volume before playing
+
 		const times = parseInt(this.bellNumber.value, 10) || 1;
 
-		this.currentBell.volume = Math.min(Math.max(volume / 100, 0), 1);
-
 		for (let i = 0; i < times; i++) {
-			setTimeout(() => {
-				this.currentBell.currentTime = 0;
-				this.currentBell.play();
-			}, i * 1500);
+			const timeoutId = setTimeout(() => {
+				const bell = new Audio(this.currentBell.src);
+				bell.volume = this.currentBell.volume;
+				bell.play();
+			}, i * 8000);
+			this.bellTimeouts.push(timeoutId);
 		}
 	}
 }
