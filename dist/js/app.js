@@ -7483,12 +7483,15 @@ var bellManager = /*#__PURE__*/function () {
     _classCallCheck(this, bellManager);
     this.bellTimeouts = [];
     this.bellStartTimeoutId = null;
+    this.bellSwitch = document.getElementById('bellSwitch');
     this.bellStart = document.getElementById('bell-start');
     this.bellBtn = document.getElementById('invite-bell-btn');
     this.bellVolume = document.getElementById('bell-volume');
     this.volDisplay = document.getElementById('bell-volume-display');
     this.bellNumber = document.getElementById('bell-number');
     this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
+    this.bellInterval = document.getElementById('bell-interval');
+    this.bellLoopIntervalId = null;
     this.currentBell = new Audio('src/audio/bell-01.wav');
     this.events();
   }
@@ -7497,16 +7500,31 @@ var bellManager = /*#__PURE__*/function () {
     value: function events() {
       var _this = this;
       document.addEventListener('DOMContentLoaded', function () {
+        // Invite bell.
         _this.bellBtn.addEventListener('click', function () {
           _this.updateSelectedBell();
           _this.playBell();
         });
+        // Volume control.
         _this.bellVolume.addEventListener('input', _this.updateVolume.bind(_this));
+        // Select bell sound.
         _this.soundRadios.forEach(function (radio) {
           radio.addEventListener('change', function () {
             _this.updateSelectedBell();
             _this.playBell();
           });
+        });
+        // Time interval bell.
+        if (_this.bellSwitch.checked) {
+          _this.startFixedIntervalBells();
+        }
+        _this.bellSwitch.addEventListener('change', function () {
+          _this.updateSelectedBell();
+          if (_this.bellSwitch.checked) {
+            _this.startFixedIntervalBells();
+          } else {
+            _this.stopRepeatingBells();
+          }
         });
       });
     }
@@ -7557,6 +7575,31 @@ var bellManager = /*#__PURE__*/function () {
     value: function updateVolume() {
       this.volDisplay.textContent = this.bellVolume.value;
       this.currentBell.volume = this.bellVolume.value / 100;
+    }
+  }, {
+    key: "startFixedIntervalBells",
+    value: function startFixedIntervalBells() {
+      var _this3 = this;
+      this.stopRepeatingBells(); // Clear any previous loop
+      var minutes = parseInt(this.bellInterval.value, 10) || 15;
+      var intervalMs = minutes * 60 * 1000;
+
+      // First bell immediately
+      this.playBell();
+
+      // Then repeat every X minutes
+      this.bellLoopIntervalId = setInterval(function () {
+        _this3.playBell();
+      }, intervalMs);
+    }
+  }, {
+    key: "stopRepeatingBells",
+    value: function stopRepeatingBells() {
+      if (this.bellLoopIntervalId) {
+        clearInterval(this.bellLoopIntervalId);
+        this.bellLoopIntervalId = null;
+      }
+      this.resetBell(); // Optional: also cancel any scheduled `setTimeout`s
     }
   }]);
 }();

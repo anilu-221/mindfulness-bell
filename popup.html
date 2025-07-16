@@ -26,7 +26,7 @@
 		<!--Content-->
 			<!--Bell Sound-->
 			<div class="row my-4">
-				<div class="col-12">
+				<div class="col-6">
 					<p class="mb-2">Bell Sound</p>
 					<div class="btn-group btn-group-sm" role="group" aria-label="Basic radio toggle button group for selecting bell sound">
 						<input type="radio" class="btn-check" name="bell-sound" id="bell-sound-1" autocomplete="off" checked>
@@ -38,6 +38,10 @@
 						<input type="radio" class="btn-check" name="bell-sound" id="bell-sound-3" autocomplete="off">
 						<label class="btn btn-outline-primary" for="bell-sound-3">Bell 3</label>
 					</div>
+				</div>
+				<div class="col-6">
+					<p class="mb-2">Next bell in</p>
+					<p class="border rounded py-1 px-2"><span id="next-bell">15</span> seconds</p>
 				</div>
 			</div>
 
@@ -83,7 +87,7 @@
 				</div>
 			</div>
 
-			<!--Volumne-->
+			<!--Volume-->
 			<div class="row my-4">
 				<div class="col-6">
 					<p class="mb-2">
