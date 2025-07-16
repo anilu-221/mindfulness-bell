@@ -7502,6 +7502,12 @@ var bellManager = /*#__PURE__*/function () {
           _this.playBell();
         });
         _this.bellVolume.addEventListener('input', _this.updateVolume.bind(_this));
+        _this.soundRadios.forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            _this.updateSelectedBell();
+            _this.playBell();
+          });
+        });
       });
     }
   }, {

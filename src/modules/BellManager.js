@@ -19,6 +19,12 @@ class bellManager {
 				this.playBell();
 			});
 			this.bellVolume.addEventListener('input', this.updateVolume.bind(this));
+			this.soundRadios.forEach( radio => {
+				radio.addEventListener( 'change', () => {
+					this.updateSelectedBell();
+					this.playBell();
+				} );
+			} );
 		});
 	}
 
