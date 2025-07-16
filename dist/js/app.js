@@ -7491,7 +7491,7 @@ var bellManager = /*#__PURE__*/function () {
     this.bellNumber = document.getElementById('bell-number');
     this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
     this.bellInterval = document.getElementById('bell-interval');
-    this.bellLoopIntervalId = null;
+    this.nextBellDisplay = document.getElementById('next-bell');
     this.currentBell = new Audio('src/audio/bell-01.wav');
     this.events();
   }
@@ -7575,31 +7575,6 @@ var bellManager = /*#__PURE__*/function () {
     value: function updateVolume() {
       this.volDisplay.textContent = this.bellVolume.value;
       this.currentBell.volume = this.bellVolume.value / 100;
-    }
-  }, {
-    key: "startFixedIntervalBells",
-    value: function startFixedIntervalBells() {
-      var _this3 = this;
-      this.stopRepeatingBells(); // Clear any previous loop
-      var minutes = parseInt(this.bellInterval.value, 10) || 15;
-      var intervalMs = minutes * 60 * 1000;
-
-      // First bell immediately
-      this.playBell();
-
-      // Then repeat every X minutes
-      this.bellLoopIntervalId = setInterval(function () {
-        _this3.playBell();
-      }, intervalMs);
-    }
-  }, {
-    key: "stopRepeatingBells",
-    value: function stopRepeatingBells() {
-      if (this.bellLoopIntervalId) {
-        clearInterval(this.bellLoopIntervalId);
-        this.bellLoopIntervalId = null;
-      }
-      this.resetBell(); // Optional: also cancel any scheduled `setTimeout`s
     }
   }]);
 }();
