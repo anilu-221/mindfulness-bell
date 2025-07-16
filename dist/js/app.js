@@ -7481,18 +7481,23 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 var bellManager = /*#__PURE__*/function () {
   function bellManager() {
     _classCallCheck(this, bellManager);
+    // Initialize properties.
     this.bellTimeouts = [];
-    this.bellStartTimeoutId = null;
+    this.currentBell = new Audio('src/audio/bell-01.wav');
+
+    // Control elements.
     this.bellSwitch = document.getElementById('bellSwitch');
+    this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
+    this.nextBellDisplay = document.getElementById('next-bell');
+    this.bellInterval = document.getElementById('bell-interval');
+    this.bellNumber = document.getElementById('bell-number');
     this.bellStart = document.getElementById('bell-start');
-    this.bellBtn = document.getElementById('invite-bell-btn');
+    this.bellEnd = document.getElementById('bell-end');
     this.bellVolume = document.getElementById('bell-volume');
     this.volDisplay = document.getElementById('bell-volume-display');
-    this.bellNumber = document.getElementById('bell-number');
-    this.soundRadios = document.querySelectorAll('input[name="bell-sound"]');
-    this.bellInterval = document.getElementById('bell-interval');
-    this.nextBellDisplay = document.getElementById('next-bell');
-    this.currentBell = new Audio('src/audio/bell-01.wav');
+    this.bellBtn = document.getElementById('invite-bell-btn');
+
+    // Events.
     this.events();
   }
   return _createClass(bellManager, [{
@@ -7500,13 +7505,6 @@ var bellManager = /*#__PURE__*/function () {
     value: function events() {
       var _this = this;
       document.addEventListener('DOMContentLoaded', function () {
-        // Invite bell.
-        _this.bellBtn.addEventListener('click', function () {
-          _this.updateSelectedBell();
-          _this.playBell();
-        });
-        // Volume control.
-        _this.bellVolume.addEventListener('input', _this.updateVolume.bind(_this));
         // Select bell sound.
         _this.soundRadios.forEach(function (radio) {
           radio.addEventListener('change', function () {
@@ -7514,17 +7512,17 @@ var bellManager = /*#__PURE__*/function () {
             _this.playBell();
           });
         });
-        // Time interval bell.
-        if (_this.bellSwitch.checked) {
-          _this.startFixedIntervalBells();
-        }
         _this.bellSwitch.addEventListener('change', function () {
           _this.updateSelectedBell();
-          if (_this.bellSwitch.checked) {
-            _this.startFixedIntervalBells();
-          } else {
-            _this.stopRepeatingBells();
-          }
+        });
+
+        // Volume control.
+        _this.bellVolume.addEventListener('input', _this.updateVolume.bind(_this));
+
+        // Invite bell.
+        _this.bellBtn.addEventListener('click', function () {
+          _this.updateSelectedBell();
+          _this.playBell();
         });
       });
     }
@@ -7549,8 +7547,7 @@ var bellManager = /*#__PURE__*/function () {
     value: function playBell() {
       var _this2 = this;
       this.resetBell();
-      this.updateVolume(); // Set volume before playing
-
+      this.updateVolume();
       var times = parseInt(this.bellNumber.value, 10) || 1;
       for (var i = 0; i < times; i++) {
         var timeoutId = setTimeout(function () {
@@ -7564,7 +7561,6 @@ var bellManager = /*#__PURE__*/function () {
   }, {
     key: "resetBell",
     value: function resetBell() {
-      // Clear all scheduled timeouts
       this.bellTimeouts.forEach(function (timeoutId) {
         return clearTimeout(timeoutId);
       });

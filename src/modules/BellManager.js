@@ -1,29 +1,32 @@
 class bellManager {
 	constructor() {
+		// Initialize properties.
 		this.bellTimeouts        = [];
-		this.bellStartTimeoutId  = null;
+		this.currentBell         = new Audio('src/audio/bell-01.wav');
+
+		// Control elements.
 		this.bellSwitch          = document.getElementById( 'bellSwitch' );
+
+		this.soundRadios         = document.querySelectorAll('input[name="bell-sound"]');
+		this.nextBellDisplay     = document.getElementById('next-bell');
+
+		this.bellInterval	     = document.getElementById('bell-interval');
+		this.bellNumber          = document.getElementById('bell-number');
+		
 		this.bellStart           = document.getElementById('bell-start');
-		this.bellBtn             = document.getElementById('invite-bell-btn');
+		this.bellEnd             = document.getElementById('bell-end');
+
 		this.bellVolume          = document.getElementById('bell-volume');
 		this.volDisplay          = document.getElementById('bell-volume-display');
-		this.bellNumber          = document.getElementById('bell-number');
-		this.soundRadios         = document.querySelectorAll('input[name="bell-sound"]');
-		this.bellInterval	     = document.getElementById('bell-interval');
-		this.nextBellDisplay     = document.getElementById('next-bell');
-		this.currentBell         = new Audio('src/audio/bell-01.wav');
+
+		this.bellBtn             = document.getElementById('invite-bell-btn');
+		
+		// Events.
 		this.events();
 	}
 
 	events() {
 		document.addEventListener('DOMContentLoaded', () => {
-			// Invite bell.
-			this.bellBtn.addEventListener('click', () => {
-				this.updateSelectedBell();
-				this.playBell();
-			});
-			// Volume control.
-			this.bellVolume.addEventListener('input', this.updateVolume.bind(this));
 			// Select bell sound.
 			this.soundRadios.forEach( radio => {
 				radio.addEventListener( 'change', () => {
@@ -31,17 +34,17 @@ class bellManager {
 					this.playBell();
 				} );
 			} );
-			// Time interval bell.
-			if (this.bellSwitch.checked) {
-				this.startFixedIntervalBells();
-			}
 			this.bellSwitch.addEventListener('change', () => {
 				this.updateSelectedBell();
-				if ( this.bellSwitch.checked ) {
-					this.startFixedIntervalBells();
-				} else {
-					this.stopRepeatingBells();
-				}
+			});
+
+			// Volume control.
+			this.bellVolume.addEventListener('input', this.updateVolume.bind(this));
+
+			// Invite bell.
+			this.bellBtn.addEventListener('click', () => {
+				this.updateSelectedBell();
+				this.playBell();
 			});
 		});
 	}
@@ -65,7 +68,7 @@ class bellManager {
 
 	playBell() {
 		this.resetBell();
-		this.updateVolume(); // Set volume before playing
+		this.updateVolume();
 
 		const times = parseInt( this.bellNumber.value, 10 ) || 1;
 
@@ -75,13 +78,11 @@ class bellManager {
 				bell.volume = this.currentBell.volume;
 				bell.play();
 			}, i * 8000);
-
-			this.bellTimeouts.push(timeoutId);
+			this.bellTimeouts.push( timeoutId );
 		}
 	}
 
 	resetBell() {
-		// Clear all scheduled timeouts
 		this.bellTimeouts.forEach( timeoutId => clearTimeout( timeoutId ) );
 		this.bellTimeouts = [];
 	}
@@ -90,6 +91,8 @@ class bellManager {
 		this.volDisplay.textContent = this.bellVolume.value;
 		this.currentBell.volume = this.bellVolume.value / 100;
 	}
+
+
 }
 
 export default bellManager;
