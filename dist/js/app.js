@@ -7473,6 +7473,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
 function _defineProperties(e, r) { for (var t = 0; t < r.length; t++) { var o = r[t]; o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o); } }
 function _createClass(e, r, t) { return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", { writable: !1 }), e; }
@@ -7482,7 +7488,8 @@ var bellManager = /*#__PURE__*/function () {
   function bellManager() {
     _classCallCheck(this, bellManager);
     // Initialize properties.
-    this.bellTimeouts = [];
+    this.bellIntervalTimeouts = [];
+    this.bellRepeatedTimeouts = [];
     this.currentBell = new Audio('src/audio/bell-01.wav');
 
     // Control elements.
@@ -7505,11 +7512,14 @@ var bellManager = /*#__PURE__*/function () {
     value: function events() {
       var _this = this;
       document.addEventListener('DOMContentLoaded', function () {
+        // Initialize bell sound.
+        _this.setBellIntervals();
+
         // Select bell sound.
         _this.soundRadios.forEach(function (radio) {
           radio.addEventListener('change', function () {
             _this.updateSelectedBell();
-            _this.playBell();
+            _this.playBellOnce();
           });
         });
         _this.bellSwitch.addEventListener('change', function () {
@@ -7525,6 +7535,101 @@ var bellManager = /*#__PURE__*/function () {
           _this.playBell();
         });
       });
+    }
+  }, {
+    key: "setBellIntervals",
+    value: function setBellIntervals() {
+      var _this2 = this;
+      this.updateSelectedBell();
+
+      // Interval
+      this.bellIntervalMinutes = this.bellInterval.value;
+      this.bellIntervalMilliseconds = parseInt(this.bellIntervalMinutes, 10) * 60 * 1000;
+
+      // Set Dates.
+      this.now = new Date();
+      var _this$bellStart$value = this.bellStart.value.split(':').map(Number);
+      var _this$bellStart$value2 = _slicedToArray(_this$bellStart$value, 2);
+      this.startHour = _this$bellStart$value2[0];
+      this.startMinutes = _this$bellStart$value2[1];
+      var _this$bellEnd$value$s = this.bellEnd.value.split(':').map(Number);
+      var _this$bellEnd$value$s2 = _slicedToArray(_this$bellEnd$value$s, 2);
+      this.endHour = _this$bellEnd$value$s2[0];
+      this.endMinutes = _this$bellEnd$value$s2[1];
+      this.startDate = new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate(), this.startHour, this.startMinutes);
+      this.endDate = new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate(), this.endHour, this.endMinutes);
+      // If the end time is before the start time, assume it is the next day.
+      if (this.endDate < this.startDate) {
+        this.endDate.setDate(this.endDate.getDate() + 1);
+      }
+
+      // Check if the current time is within the start and end time.
+      if (this.now > this.startDate && this.now < this.endDate) {
+        this.msSinceStart = this.now - this.startDate;
+        this.timeUntilNextInterval = this.bellIntervalMilliseconds - this.msSinceStart % this.bellIntervalMilliseconds;
+        this.nextBellTime = new Date(this.now.getTime() + this.timeUntilNextInterval);
+        while (this.nextBellTime <= this.endDate) {
+          this.delay = this.nextBellTime.getTime() - this.now.getTime();
+          var timeoutId = setTimeout(function () {
+            return _this2.playBell();
+          }, this.delay);
+          var scheduledTime = Date.now() + this.delay;
+          this.bellIntervalTimeouts.push({
+            timeoutId: timeoutId,
+            scheduledTime: scheduledTime
+          });
+          this.nextBellTime = new Date(this.nextBellTime.getTime() + this.bellIntervalMilliseconds);
+        }
+      } else if (this.now <= this.startDate) {
+        this.nextBellTime = new Date(this.startDate);
+        while (this.nextBellTime <= this.endDate) {
+          this.delay = this.nextBellTime.getTime() - this.now.getTime();
+          var _timeoutId = setTimeout(function () {
+            return _this2.playBell();
+          }, this.delay);
+          var _scheduledTime = Date.now() + this.delay;
+          this.bellIntervalTimeouts.push({
+            timeoutId: _timeoutId,
+            scheduledTime: _scheduledTime
+          });
+          this.nextBellTime = new Date(this.nextBellTime.getTime() + this.bellIntervalMilliseconds);
+        }
+      }
+      this.startCountdownDisplay();
+    }
+  }, {
+    key: "startCountdownDisplay",
+    value: function startCountdownDisplay() {
+      var _this3 = this;
+      if (this.countdownIntervalId) {
+        clearInterval(this.countdownIntervalId);
+      }
+      this.countdownIntervalId = setInterval(function () {
+        if (!_this3.bellIntervalTimeouts.length) {
+          _this3.nextBellDisplay.innerHTML = '<span class="text-muted text-small small">No bells scheduled</span>';
+          clearInterval(_this3.countdownIntervalId);
+          return;
+        }
+        var scheduledTime = _this3.bellIntervalTimeouts[0].scheduledTime; // Next bell
+        var remaining = Math.max(0, scheduledTime - Date.now());
+        var mins = Math.floor(remaining / 60000);
+        var secs = Math.floor(remaining % 60000 / 1000);
+        _this3.nextBellDisplay.textContent = "".concat(mins, ":").concat(secs.toString().padStart(2, '0'));
+        if (remaining <= 0) {
+          _this3.nextBellDisplay.textContent = '00:00';
+          clearInterval(_this3.countdownIntervalId);
+          _this3.countdownIntervalId = null;
+
+          // Remove expired bell
+          _this3.bellIntervalTimeouts.shift();
+
+          // If more bells are scheduled, start countdown to the next one
+          if (_this3.bellIntervalTimeouts.length > 0) {
+            _this3.startCountdownDisplay();
+          }
+          return;
+        }
+      }, 1000);
     }
   }, {
     key: "updateSelectedBell",
@@ -7545,26 +7650,36 @@ var bellManager = /*#__PURE__*/function () {
   }, {
     key: "playBell",
     value: function playBell() {
-      var _this2 = this;
-      this.resetBell();
+      var _this4 = this;
+      this.resetRepeatedTimeout();
       this.updateVolume();
       var times = parseInt(this.bellNumber.value, 10) || 1;
       for (var i = 0; i < times; i++) {
+        var delay = i * 8000;
         var timeoutId = setTimeout(function () {
-          var bell = new Audio(_this2.currentBell.src);
-          bell.volume = _this2.currentBell.volume;
+          var bell = new Audio(_this4.currentBell.src);
+          bell.volume = _this4.currentBell.volume;
           bell.play();
-        }, i * 8000);
-        this.bellTimeouts.push(timeoutId);
+        }, delay);
+        var scheduledTime = Date.now() + this.delay;
+        this.bellRepeatedTimeouts.push(timeoutId);
       }
     }
   }, {
-    key: "resetBell",
-    value: function resetBell() {
-      this.bellTimeouts.forEach(function (timeoutId) {
+    key: "playBellOnce",
+    value: function playBellOnce() {
+      this.updateVolume();
+      var bell = new Audio(this.currentBell.src);
+      bell.volume = this.currentBell.volume;
+      bell.play();
+    }
+  }, {
+    key: "resetRepeatedTimeout",
+    value: function resetRepeatedTimeout() {
+      this.bellRepeatedTimeouts.forEach(function (timeoutId) {
         return clearTimeout(timeoutId);
       });
-      this.bellTimeouts = [];
+      this.bellRepeatedTimeouts = [];
     }
   }, {
     key: "updateVolume",
