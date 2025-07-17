@@ -7512,6 +7512,35 @@ var bellManager = /*#__PURE__*/function () {
     value: function events() {
       var _this = this;
       document.addEventListener('DOMContentLoaded', function () {
+        // Load user settings from chrome storage.
+        chrome.storage.local.get(['selectedBellId', 'bellInterval', 'bellNumber', 'bellStart', 'bellEnd', 'bellVolume'], function (data) {
+          // Bell radio.
+          if (data.selectedBellId) {
+            _this.soundRadios.forEach(function (radio) {
+              if (radio.id === data.selectedBellId) {
+                radio.checked = true;
+              } else {
+                radio.checked = false;
+              }
+            });
+          }
+
+          // Bell interval.
+          _this.bellInterval.value = data.bellInterval || 15;
+
+          // Bell number.
+          _this.bellNumber.value = data.bellNumber || 1;
+
+          // Bell start time.
+          _this.bellStart.value = data.bellStart || '07:00';
+
+          // Bell end time.
+          _this.bellEnd.value = data.bellEnd || '22:00';
+
+          // Bell volume.
+          _this.bellVolume.value = data.bellVolume || 50;
+          _this.volDisplay.textContent = _this.bellVolume.value;
+        });
         // Initialize bell sound.
         _this.setBellIntervals();
 
@@ -7533,6 +7562,60 @@ var bellManager = /*#__PURE__*/function () {
         _this.bellBtn.addEventListener('click', function () {
           _this.updateSelectedBell();
           _this.playBell();
+        });
+
+        /**
+         * Save user settings on chrome storage.
+         */
+
+        // Bell Radio.
+        _this.soundRadios.forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            var radioChecked = '';
+            _this.soundRadios.forEach(function (r) {
+              if (r.checked) {
+                radioChecked = r.id;
+              }
+            });
+            chrome.storage.local.set({
+              selectedBellId: radioChecked
+            });
+          });
+        });
+
+        // Bell interval.
+        _this.bellInterval.addEventListener('change', function (e) {
+          chrome.storage.local.set({
+            bellInterval: parseInt(_this.bellInterval.value)
+          });
+        });
+
+        // Bell number.
+        _this.bellNumber.addEventListener('change', function (e) {
+          chrome.storage.local.set({
+            bellNumber: parseInt(_this.bellNumber.value)
+          });
+        });
+
+        // Bell Start.
+        _this.bellStart.addEventListener('change', function (e) {
+          chrome.storage.local.set({
+            bellStart: _this.bellStart.value
+          });
+        });
+
+        // Bell End.
+        _this.bellEnd.addEventListener('change', function (e) {
+          chrome.storage.local.set({
+            bellEnd: _this.bellEnd.value
+          });
+        });
+
+        //Volume.
+        _this.bellVolume.addEventListener('change', function (e) {
+          chrome.storage.local.set({
+            bellVolume: parseInt(_this.bellVolume.value)
+          });
         });
       });
     }

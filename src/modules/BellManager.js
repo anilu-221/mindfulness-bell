@@ -28,6 +28,36 @@ class bellManager {
 
 	events() {
 		document.addEventListener('DOMContentLoaded', () => {
+			// Load user settings from chrome storage.
+			chrome.storage.local.get(['selectedBellId', 'bellInterval', 'bellNumber', 'bellStart', 'bellEnd', 'bellVolume'], (data) => {
+				// Bell radio.
+				if (data.selectedBellId) {
+					this.soundRadios.forEach( radio => {
+						if (radio.id === data.selectedBellId) {
+							radio.checked = true;
+						} else {
+							radio.checked = false;
+						}
+					});
+				}
+
+				// Bell interval.
+				this.bellInterval.value = data.bellInterval || 15;
+
+				// Bell number.
+				this.bellNumber.value = data.bellNumber || 1;
+
+				// Bell start time.
+				this.bellStart.value = data.bellStart || '07:00';
+
+				// Bell end time.
+				this.bellEnd.value = data.bellEnd || '22:00';
+
+				// Bell volume.
+				this.bellVolume.value = data.bellVolume || 50;
+				this.volDisplay.textContent = this.bellVolume.value;
+
+			});
 			// Initialize bell sound.
 			this.setBellIntervals();
 
@@ -49,6 +79,48 @@ class bellManager {
 			this.bellBtn.addEventListener('click', () => {
 				this.updateSelectedBell();
 				this.playBell();
+			});
+
+			/**
+			 * Save user settings on chrome storage.
+			 */
+
+			// Bell Radio.
+			this.soundRadios.forEach( radio => {
+				radio.addEventListener('change', () => {
+					let radioChecked = '';
+					this.soundRadios.forEach( r => {
+						if ( r.checked ) {
+							radioChecked = r.id;
+						}
+					});
+					chrome.storage.local.set({ selectedBellId: radioChecked });
+				});
+			});
+
+			// Bell interval.
+			this.bellInterval.addEventListener('change', (e) => {
+				chrome.storage.local.set({ bellInterval: parseInt(this.bellInterval.value) });
+			});
+
+			// Bell number.
+			this.bellNumber.addEventListener('change', (e) => {
+				chrome.storage.local.set({ bellNumber: parseInt(this.bellNumber.value) });
+			});
+
+			// Bell Start.
+			this.bellStart.addEventListener('change', (e) => {
+				chrome.storage.local.set({ bellStart: this.bellStart.value });
+			});
+
+			// Bell End.
+			this.bellEnd.addEventListener('change', (e) => {
+				chrome.storage.local.set({ bellEnd: this.bellEnd.value });
+			});
+
+			//Volume.
+			this.bellVolume.addEventListener('change', (e) => {
+				chrome.storage.local.set({ bellVolume: parseInt(this.bellVolume.value) });
 			});
 		});
 	}
